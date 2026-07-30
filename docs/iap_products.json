@@ -1,0 +1,15 @@
+{
+  "name": "PetCare",
+  "id": "com.petcaremng.petcare",
+  "version": "1.0.0",
+  "disable": 0,
+  "code": "FULL_IAP",
+  "status": "ONLINE",
+  "products": {
+    "coin_packs": [
+      "pcn_pack_1", "pcn_pack_2", "pcn_pack_3", "pcn_pack_4", "pcn_pack_5",
+      "pcn_pack_6", "pcn_pack_7", "pcn_pack_8", "pcn_pack_9", "pcn_pack_10"
+    ],
+    "remove_ads": "pcn_remove_ads"
+  }
+}
