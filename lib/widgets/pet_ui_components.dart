@@ -2,8 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 import '../core/constants/app_colors.dart';
+import '../providers/shop_provider.dart';
 import 'home_style.dart';
 
 /// Hero illustration for onboarding — person + dog, flat pastel style.
@@ -250,10 +252,15 @@ class PurpleHeaderBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    LinearGradient gradient = AppColors.reminderGradient;
+    try {
+      gradient = context.watch<ShopProvider>().activeTheme.headerGradient;
+    } catch (_) {}
+
     return Container(
-      decoration: const BoxDecoration(
-        gradient: AppColors.reminderGradient,
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
+      decoration: BoxDecoration(
+        gradient: gradient,
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
       ),
       child: SafeArea(
         bottom: false,

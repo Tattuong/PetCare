@@ -8,6 +8,10 @@
 	<string>PetCare needs access to your photo library so you can add pet profile photos.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>PetCare needs camera access so you can take pet profile photos.</string>
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-3940256099942544~1458002511</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>This allows the app to show ads that are more relevant to you.</string>
 	<key>CFBundleDisplayName</key>
 	<string>PetCare</string>
 	<key>CFBundleExecutable</key>

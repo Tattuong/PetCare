@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
+import '../../models/app_theme_preset.dart';
+import '../../providers/shop_provider.dart';
+import '../../widgets/ad_banner_slot.dart';
+import '../../widgets/app_ui.dart';
 import '../../widgets/home_style.dart';
 import 'home/home_screen.dart';
 import 'settings/settings_screen.dart';
@@ -97,10 +102,29 @@ class MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
+    final shop = context.watch<ShopProvider>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primary = context.themePrimary;
+    final primaryDark = context.themePrimaryDark;
+    final pageBg = isDark ? shop.activeTheme.darkBackground : shop.activeTheme.background;
+
     return Scaffold(
-      backgroundColor: HomeStyle.pageBg,
-      body: _buildTab(_index),
-      bottomNavigationBar: _BottomNav(index: _index, onChanged: _onTabChanged),
+      backgroundColor: pageBg,
+      body: ThemedPageBackground(
+        child: _buildTab(_index),
+      ),
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const AdBannerSlot(),
+          _BottomNav(
+            index: _index,
+            onChanged: _onTabChanged,
+            primary: primary,
+            primaryDark: primaryDark,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -108,49 +132,77 @@ class MainShellState extends State<MainShell> {
 class _BottomNav extends StatelessWidget {
   final int index;
   final ValueChanged<int> onChanged;
+  final Color primary;
+  final Color primaryDark;
 
-  const _BottomNav({required this.index, required this.onChanged});
+  const _BottomNav({
+    required this.index,
+    required this.onChanged,
+    required this.primary,
+    required this.primaryDark,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final bottom = MediaQuery.paddingOf(context).bottom;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-      padding: EdgeInsets.fromLTRB(8, 10, 8, bottom > 0 ? bottom : 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: HomeStyle.softShadow(),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _NavItem(
-            label: AppStrings.t(context, 'navHome'),
-            active: index == 0,
-            icon: Icons.home_rounded,
-            onTap: () => onChanged(0),
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.darkSurface : Colors.white,
+            borderRadius: BorderRadius.circular(28),
+            boxShadow: [
+              BoxShadow(
+                color: primary.withValues(alpha: 0.12),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
-          _NavItem(
-            label: AppStrings.t(context, 'navTips'),
-            active: index == 1,
-            icon: Icons.lightbulb_outline_rounded,
-            onTap: () => onChanged(1),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _NavItem(
+                  label: AppStrings.t(context, 'navHome'),
+                  active: index == 0,
+                  icon: Icons.home_rounded,
+                  primary: primary,
+                  primaryDark: primaryDark,
+                  onTap: () => onChanged(0),
+                ),
+                _NavItem(
+                  label: AppStrings.t(context, 'navTips'),
+                  active: index == 1,
+                  icon: Icons.lightbulb_outline_rounded,
+                  primary: primary,
+                  primaryDark: primaryDark,
+                  onTap: () => onChanged(1),
+                ),
+                _NavItem(
+                  label: AppStrings.t(context, 'navLogs'),
+                  active: index == 2,
+                  icon: Icons.insights_rounded,
+                  primary: primary,
+                  primaryDark: primaryDark,
+                  onTap: () => onChanged(2),
+                ),
+                _NavItem(
+                  label: AppStrings.t(context, 'navMore'),
+                  active: false,
+                  icon: Icons.grid_view_rounded,
+                  primary: primary,
+                  primaryDark: primaryDark,
+                  onTap: () => onChanged(3),
+                ),
+              ],
+            ),
           ),
-          _NavItem(
-            label: AppStrings.t(context, 'navLogs'),
-            active: index == 2,
-            icon: Icons.insights_rounded,
-            onTap: () => onChanged(2),
-          ),
-          _NavItem(
-            label: AppStrings.t(context, 'navMore'),
-            active: false,
-            icon: Icons.grid_view_rounded,
-            onTap: () => onChanged(3),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -160,9 +212,18 @@ class _NavItem extends StatelessWidget {
   final String label;
   final bool active;
   final IconData icon;
+  final Color primary;
+  final Color primaryDark;
   final VoidCallback onTap;
 
-  const _NavItem({required this.label, required this.active, required this.icon, required this.onTap});
+  const _NavItem({
+    required this.label,
+    required this.active,
+    required this.icon,
+    required this.primary,
+    required this.primaryDark,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -175,19 +236,19 @@ class _NavItem extends StatelessWidget {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
           decoration: BoxDecoration(
-            color: active ? AppColors.pastelLavender.withValues(alpha: 0.45) : Colors.transparent,
+            color: active ? primary.withValues(alpha: 0.22) : Colors.transparent,
             borderRadius: BorderRadius.circular(20),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 22, color: active ? AppColors.primaryDark : AppColors.textMuted),
+              Icon(icon, size: 22, color: active ? primaryDark : AppColors.textMuted),
               const SizedBox(height: 4),
               Text(
                 label,
                 style: HomeStyle.badgeText(highlight: active).copyWith(
                   fontSize: 10,
-                  color: active ? AppColors.primaryDark : AppColors.textMuted,
+                  color: active ? primaryDark : AppColors.textMuted,
                 ),
               ),
             ],

@@ -9,11 +9,9 @@ class PrivacyPolicyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
-      body: AppDecorations.meshBackground(
-        isDark: isDark,
+      backgroundColor: Colors.transparent,
+      body: ThemedPageBackground(
         child: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,

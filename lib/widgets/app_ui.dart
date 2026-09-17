@@ -81,20 +81,19 @@ class AppDecorations {
     required bool isDark,
     required Widget child,
     LinearGradient? accentGradient,
+    Color? backgroundColor,
     bool lite = false,
   }) {
+    final bg = backgroundColor ?? (isDark ? AppColors.darkBackground : AppColors.background);
     if (lite) {
-      return ColoredBox(
-        color: isDark ? AppColors.darkBackground : AppColors.background,
-        child: child,
-      );
+      return ColoredBox(color: bg, child: child);
     }
 
     final gradient = accentGradient;
     final useCustom = gradient != null && gradient.colors.length >= 2;
 
     return ColoredBox(
-      color: isDark ? AppColors.darkBackground : AppColors.background,
+      color: bg,
       child: Stack(
         fit: StackFit.expand,
         children: [
@@ -105,7 +104,7 @@ class AppDecorations {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: gradient.colors.map((c) => c.withValues(alpha: isDark ? 0.1 : 0.06)).toList(),
+                    colors: gradient.colors.map((c) => c.withValues(alpha: isDark ? 0.18 : 0.12)).toList(),
                   ),
                 ),
               ),
@@ -113,6 +112,39 @@ class AppDecorations {
           child,
         ],
       ),
+    );
+  }
+}
+
+/// Page wash using the shop theme + background so Apply Theme tints the whole app.
+class ThemedPageBackground extends StatelessWidget {
+  final Widget child;
+
+  const ThemedPageBackground({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    ShopProvider? shop;
+    try {
+      shop = context.watch<ShopProvider>();
+    } catch (_) {}
+
+    final preset = shop?.activeTheme;
+    final bg = preset == null
+        ? Theme.of(context).scaffoldBackgroundColor
+        : (isDark ? preset.darkBackground : preset.background);
+    final gradient = shop == null
+        ? null
+        : (shop.activeBackground.id == ShopCatalog.defaultBackgroundId
+            ? preset!.headerGradient
+            : shop.activeBackground.gradient);
+
+    return AppDecorations.meshBackground(
+      isDark: isDark,
+      backgroundColor: bg,
+      accentGradient: gradient,
+      child: child,
     );
   }
 }
@@ -160,8 +192,6 @@ class AppPageScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     final content = SafeArea(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -201,19 +231,10 @@ class AppPageScaffold extends StatelessWidget {
       return content;
     }
 
-    final shop = context.watch<ShopProvider>();
-    final preset = shop.activeTheme;
-
     return Scaffold(
-      backgroundColor: isDark ? preset.darkBackground : preset.background,
+      backgroundColor: Colors.transparent,
       floatingActionButton: floatingActionButton,
-      body: AppDecorations.meshBackground(
-        isDark: isDark,
-        accentGradient: shop.activeBackground.id == ShopCatalog.defaultBackgroundId
-            ? null
-            : shop.activeBackground.gradient,
-        child: content,
-      ),
+      body: ThemedPageBackground(child: content),
     );
   }
 }
@@ -464,11 +485,9 @@ class AppFormScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
-      body: AppDecorations.meshBackground(
-        isDark: isDark,
+      backgroundColor: Colors.transparent,
+      body: ThemedPageBackground(
         child: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,

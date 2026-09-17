@@ -14,6 +14,8 @@ import '../../models/pet.dart';
 import '../../providers/activity_provider.dart';
 import '../../providers/pet_provider.dart';
 import '../../providers/shop_provider.dart';
+import '../../models/app_theme_preset.dart';
+import '../../widgets/app_ui.dart';
 import '../../widgets/home_style.dart';
 import '../../widgets/pet_ui_components.dart';
 import '../feeding/feeding_screen.dart';
@@ -45,8 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final pet = context.select<PetProvider, Pet?>((p) => p.activePet);
 
     if (pet == null) {
-      return ColoredBox(
-        color: HomeStyle.pageBg,
+      return ThemedPageBackground(
         child: Center(child: _EmptyPetPrompt(onAdd: () => _showAddPetDialog(context))),
       );
     }
@@ -56,8 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final activity = context.read<ActivityProvider>();
     final reminder = _nextReminder(activity, pet.id, vi);
 
-    return ColoredBox(
-      color: HomeStyle.pageBg,
+    return ThemedPageBackground(
       child: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -780,7 +780,7 @@ class _EmptyPetPrompt extends StatelessWidget {
             width: double.infinity,
             child: FilledButton(
               style: FilledButton.styleFrom(
-                backgroundColor: AppColors.primaryDark,
+                backgroundColor: context.themePrimary,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(HomeStyle.buttonRadius)),
               ),

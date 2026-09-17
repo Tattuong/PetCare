@@ -88,7 +88,12 @@ class ShopProvider extends ChangeNotifier {
     if (!isBillingDisabled && (Platform.isAndroid || Platform.isIOS)) {
       await _billing.init(
         onPurchase: _handlePurchase,
-        onError: () => notifyListeners(),
+        onError: () {
+          _isPurchasing = false;
+          _lastMessage = 'purchaseFailed';
+          notifyListeners();
+        },
+        onCanceled: endPurchaseUi,
       );
     }
 
@@ -103,6 +108,12 @@ class ShopProvider extends ChangeNotifier {
 
   Future<void> _loadLocal() async {
     _coins = await StorageService.instance.getInt(_coinsKey) ?? 0;
+    const grantKey = 'pcn_dev_grant_1000';
+    if (await StorageService.instance.getBool(grantKey) == true) {
+      _coins = (_coins - 1000).clamp(0, 1 << 30);
+      await StorageService.instance.remove(grantKey);
+      await StorageService.instance.saveInt(_coinsKey, _coins);
+    }
     final owned = await StorageService.instance.getStringList(_ownedKey);
     _ownedItems = owned?.toSet() ?? {};
     _activeThemeId =
@@ -318,6 +329,12 @@ class ShopProvider extends ChangeNotifier {
 
   void clearLastMessage() => _lastMessage = null;
   void clearCoinEvent() => _lastCoinEvent = null;
+
+  void endPurchaseUi() {
+    if (!_isPurchasing) return;
+    _isPurchasing = false;
+    notifyListeners();
+  }
 
   void _emitCoinEarned(int amount, String messageKey) {
     if (amount <= 0) return;

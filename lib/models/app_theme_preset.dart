@@ -108,8 +108,40 @@ class AppThemePreset {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         side: BorderSide(color: primary.withValues(alpha: 0.15)),
       ),
+      extensions: [
+        PetPalette(
+          primaryDark: Color.lerp(primary, const Color(0xFF1A1528), 0.22)!,
+        ),
+      ],
     );
   }
+}
+
+@immutable
+class PetPalette extends ThemeExtension<PetPalette> {
+  final Color primaryDark;
+
+  const PetPalette({required this.primaryDark});
+
+  static PetPalette of(BuildContext context) {
+    return Theme.of(context).extension<PetPalette>() ??
+        const PetPalette(primaryDark: AppColors.primaryDark);
+  }
+
+  @override
+  PetPalette copyWith({Color? primaryDark}) => PetPalette(primaryDark: primaryDark ?? this.primaryDark);
+
+  @override
+  PetPalette lerp(ThemeExtension<PetPalette>? other, double t) {
+    if (other is! PetPalette) return this;
+    return PetPalette(primaryDark: Color.lerp(primaryDark, other.primaryDark, t)!);
+  }
+}
+
+extension PetThemeContext on BuildContext {
+  Color get themePrimary => Theme.of(this).colorScheme.primary;
+  Color get themePrimaryDark => PetPalette.of(this).primaryDark;
+  Color get themeBg => Theme.of(this).scaffoldBackgroundColor;
 }
 
 class AppThemePresets {

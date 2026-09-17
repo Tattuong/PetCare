@@ -158,14 +158,14 @@ class ShopScreenState extends State<ShopScreen> with SingleTickerProviderStateMi
     final shop = context.watch<ShopProvider>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final items = _itemsFor(_tab);
-    final bg = widget.embedded || isDark ? AppColors.trueBlack : AppColors.background;
+    final primary = context.themePrimary;
 
     final body = Stack(
       children: [
         Positioned(
           top: -120,
           left: -80,
-          child: GlowOrb(color: AppColors.primary.withValues(alpha: isDark ? 0.35 : 0.22), size: 260),
+          child: GlowOrb(color: primary.withValues(alpha: isDark ? 0.35 : 0.22), size: 260),
         ),
         Positioned(
           top: 40,
@@ -220,10 +220,13 @@ class ShopScreenState extends State<ShopScreen> with SingleTickerProviderStateMi
     );
 
     if (widget.embedded) {
-      return ColoredBox(color: bg, child: body);
+      return ThemedPageBackground(child: body);
     }
 
-    return Scaffold(backgroundColor: bg, body: body);
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: ThemedPageBackground(child: body),
+    );
   }
 }
 
@@ -340,24 +343,29 @@ class _StarBalanceCard extends StatelessWidget {
                         AppStrings.t(context, 'yourWallet'),
                         style: const TextStyle(color: AppColors.textSecondary, fontSize: 12, fontWeight: FontWeight.w500),
                       ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.baseline,
-                        textBaseline: TextBaseline.alphabetic,
-                        children: [
-                          Text(
-                            '${shop.coins}',
-                            style: const TextStyle(color: AppColors.textPrimary, fontSize: 36, fontWeight: FontWeight.w700),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(AppStrings.t(context, 'coinsLabel'), style: const TextStyle(color: AppColors.onSurfaceVariant, fontSize: 14)),
-                        ],
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.alphabetic,
+                          children: [
+                            Text(
+                              '${shop.coins}',
+                              style: const TextStyle(color: AppColors.textPrimary, fontSize: 36, fontWeight: FontWeight.w700),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(AppStrings.t(context, 'coinsLabel'), style: const TextStyle(color: AppColors.onSurfaceVariant, fontSize: 14)),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
-                if (!shop.isBillingDisabled)
+                if (!shop.isBillingDisabled) ...[
+                  const SizedBox(width: 10),
                   Material(
-                    color: AppColors.primary,
+                    color: context.themePrimary,
                     borderRadius: BorderRadius.circular(16),
                     child: InkWell(
                       borderRadius: BorderRadius.circular(16),
@@ -378,6 +386,7 @@ class _StarBalanceCard extends StatelessWidget {
                       ),
                     ),
                   ),
+                ],
               ],
             ),
       ),

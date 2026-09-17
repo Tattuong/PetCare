@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_strings.dart';
+import '../models/app_theme_preset.dart';
 import '../providers/shop_provider.dart';
 import '../widgets/pet_ui_components.dart';
 import 'main_shell.dart';
@@ -64,9 +65,16 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
+    ShopProvider? shop;
+    try {
+      shop = context.watch<ShopProvider>();
+    } catch (_) {}
+    final gradient = shop?.activeTheme.headerGradient ?? AppColors.splashGradient;
+    final indicator = context.themePrimary;
+
     return Scaffold(
       body: DecoratedBox(
-        decoration: const BoxDecoration(gradient: AppColors.splashGradient),
+        decoration: BoxDecoration(gradient: gradient),
         child: SafeArea(
           child: FadeTransition(
             opacity: _fadeAnim,
@@ -87,10 +95,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 const Spacer(),
                 const PetHeroIllustration(height: 220),
                 const Spacer(),
-                const SizedBox(
+                SizedBox(
                   width: 28,
                   height: 28,
-                  child: CircularProgressIndicator(strokeWidth: 2.5, color: AppColors.primaryDark),
+                  child: CircularProgressIndicator(strokeWidth: 2.5, color: indicator),
                 ),
                 const SizedBox(height: 48),
               ],

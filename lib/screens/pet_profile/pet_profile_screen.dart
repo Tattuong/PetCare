@@ -12,6 +12,7 @@ import '../../models/pet.dart';
 import '../../providers/activity_provider.dart';
 import '../../providers/pet_provider.dart';
 import '../../screens/home/home_screen.dart';
+import '../../widgets/app_ui.dart';
 import '../../widgets/home_style.dart';
 import '../../widgets/pet_ui_components.dart';
 
@@ -71,8 +72,9 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
     final hasPhoto = _pet.photoPath != null && File(_pet.photoPath!).existsSync();
 
     return Scaffold(
-      backgroundColor: HomeStyle.pageBg,
-      body: Column(
+      backgroundColor: Colors.transparent,
+      body: ThemedPageBackground(
+        child: Column(
         children: [
           PurpleHeaderBar(
             title: AppStrings.t(context, 'petDetails'),
@@ -206,6 +208,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
             ),
           ),
         ],
+        ),
       ),
     );
   }

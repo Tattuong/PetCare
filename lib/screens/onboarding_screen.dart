@@ -5,8 +5,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_strings.dart';
+import '../models/app_theme_preset.dart';
 import '../providers/pet_provider.dart';
-import '../screens/home/home_screen.dart';
+import '../widgets/app_ui.dart';
 import '../widgets/home_style.dart';
 import '../widgets/pet_ui_components.dart';
 import 'main_shell.dart';
@@ -54,20 +55,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: _showForm ? _buildForm() : _buildWelcome(),
+      backgroundColor: Colors.transparent,
+      body: ThemedPageBackground(
+        child: SafeArea(
+          child: _showForm ? _buildForm() : _buildWelcome(),
+        ),
       ),
     );
   }
 
   Widget _buildWelcome() {
+    final heroHeight = (MediaQuery.sizeOf(context).height * 0.28).clamp(160.0, 280.0);
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 28),
+      padding: const EdgeInsets.fromLTRB(28, 16, 28, 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 16),
           Row(
             children: [
               Icon(Icons.pets_rounded, color: AppColors.pastelOrangeDark, size: 28),
@@ -78,28 +82,43 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ],
           ),
-          const Spacer(flex: 1),
-          const PetHeroIllustration(height: 280),
-          const SizedBox(height: 32),
-          RichText(
-            text: TextSpan(
-              style: HomeStyle.displayGreeting.copyWith(fontSize: 28, height: 1.25),
-              children: [
-                TextSpan(text: '${AppStrings.t(context, 'onboardingHeadlinePart1')} '),
-                TextSpan(text: AppStrings.t(context, 'onboardingHeadlineYou'), style: const TextStyle(color: AppColors.primaryDark)),
-                TextSpan(text: ' ${AppStrings.t(context, 'onboardingHeadlinePart2')} '),
-                TextSpan(text: AppStrings.t(context, 'onboardingHeadlinePet'), style: const TextStyle(color: AppColors.pastelOrangeDark)),
-              ],
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        PetHeroIllustration(height: heroHeight),
+                        const SizedBox(height: 24),
+                        RichText(
+                          text: TextSpan(
+                            style: HomeStyle.displayGreeting.copyWith(fontSize: 28, height: 1.25),
+                            children: [
+                              TextSpan(text: '${AppStrings.t(context, 'onboardingHeadlinePart1')} '),
+                              TextSpan(text: AppStrings.t(context, 'onboardingHeadlineYou'), style: TextStyle(color: context.themePrimary)),
+                              TextSpan(text: ' ${AppStrings.t(context, 'onboardingHeadlinePart2')} '),
+                              TextSpan(text: AppStrings.t(context, 'onboardingHeadlinePet'), style: const TextStyle(color: AppColors.pastelOrangeDark)),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(AppStrings.t(context, 'onboardingCaption'), style: HomeStyle.displaySubtitle),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           ),
-          const SizedBox(height: 12),
-          Text(AppStrings.t(context, 'onboardingCaption'), style: HomeStyle.displaySubtitle),
-          const Spacer(flex: 2),
           SizedBox(
             width: double.infinity,
             child: FilledButton(
               style: FilledButton.styleFrom(
-                backgroundColor: AppColors.primaryDark,
+                backgroundColor: context.themePrimary,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 18),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(HomeStyle.buttonRadius)),
@@ -109,11 +128,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: Text(AppStrings.t(context, 'getStarted'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
             ),
           ),
-          const SizedBox(height: 12),
           Center(
             child: TextButton(onPressed: _finish, child: Text(AppStrings.t(context, 'skip'))),
           ),
-          const SizedBox(height: 16),
         ],
       ),
     );
@@ -171,7 +188,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           const SizedBox(height: 32),
           FilledButton(
             style: FilledButton.styleFrom(
-              backgroundColor: AppColors.primaryDark,
+              backgroundColor: context.themePrimary,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(HomeStyle.buttonRadius)),
             ),

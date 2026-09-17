@@ -3,7 +3,7 @@ description: PetCare - Love Your Pets Every Day. Track pet health, vaccines, fee
 
 publish_to: "none"
 
-version: 1.0.0+1
+version: 1.0.1+2
 
 environment:
   sdk: ">=3.4.3 <4.0.0"
@@ -20,6 +20,7 @@ dependencies:
   google_fonts: ^6.3.3
   uuid: ^4.1.0
   in_app_purchase: ^3.2.1
+  google_mobile_ads: ^5.3.1
   http: ^1.2.2
   intl: ^0.20.2
   fl_chart: ^0.70.2
@@ -27,6 +28,8 @@ dependencies:
   timezone: ^0.10.0
   share_plus: ^10.1.4
   image_picker: ^1.1.2
+  image_picker_android: ^0.8.13+19
+  image_picker_platform_interface: ^2.11.1
   path_provider: ^2.1.5
   path: ^1.9.1
 

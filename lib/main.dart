@@ -1,10 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker_android/image_picker_android.dart';
+import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
 import 'package:provider/provider.dart';
 
+import 'core/constants/ad_constants.dart';
 import 'core/navigation/app_navigator.dart';
+import 'core/services/ad_service.dart';
 import 'core/services/notification_service.dart';
 import 'core/services/storage_service.dart';
 import 'providers/activity_provider.dart';
@@ -20,8 +26,16 @@ late final LocaleProvider appLocaleProvider;
 late final PetProvider appPetProvider;
 late final ActivityProvider appActivityProvider;
 
+void _useAndroidPhotoPicker() {
+  final impl = ImagePickerPlatform.instance;
+  if (impl is ImagePickerAndroid) {
+    impl.useAndroidPhotoPicker = true;
+  }
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  _useAndroidPhotoPicker();
   // Don't block app launch on network font download (common emulator hang).
   GoogleFonts.nunito();
   await StorageService.instance.init();
@@ -40,6 +54,9 @@ Future<void> main() async {
   await appActivityProvider.init();
 
   runApp(const PetCareApp());
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (AdConstants.isConfigured) unawaited(AdService.init());
+  });
 }
 
 class PetCareApp extends StatelessWidget {
